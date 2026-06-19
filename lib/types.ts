@@ -33,6 +33,7 @@ export interface Candidate {
   cover_letter: string;
   cv_path: string | null;
   cv_filename: string | null;
+  cv_text: string | null;
   cv_score: number | null;
   cv_summary: string | null;
   cv_strengths: string | null;

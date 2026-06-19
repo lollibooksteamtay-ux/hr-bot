@@ -214,8 +214,26 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
             <h3 className="font-bold text-gray-800 mb-1">Cập nhật trạng thái</h3>
             <p className="text-sm text-gray-500 mb-4">{selectedCandidate.name} · {selectedCandidate.email}</p>
 
+            {/* Nội dung CV */}
+            {selectedCandidate.cv_text && (
+              <div className="mb-4">
+                <div className="text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
+                  <span>Nội dung CV</span>
+                  {selectedCandidate.cv_filename && (
+                    <a href={`/api/candidates/${selectedCandidate.id}/cv`} target="_blank"
+                      className="text-xs text-blue-500 hover:underline">
+                      📄 Tải file gốc
+                    </a>
+                  )}
+                </div>
+                <div className="border rounded-lg p-3 bg-gray-50 max-h-56 overflow-y-auto text-xs text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
+                  {selectedCandidate.cv_text}
+                </div>
+              </div>
+            )}
+
             {selectedCandidate.cv_summary && (
-              <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm">
+              <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm">
                 <div className="font-medium text-gray-600 mb-1">AI nhận xét:</div>
                 <p className="text-gray-700">{selectedCandidate.cv_summary}</p>
                 {selectedCandidate.cv_strengths && (
