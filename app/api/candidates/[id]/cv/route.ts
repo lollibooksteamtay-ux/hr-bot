@@ -6,7 +6,7 @@ import { getDb } from '@/lib/db';
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const db = await getDb();
   const res = await db.execute({ sql: 'SELECT cv_path, cv_filename FROM candidates WHERE id = ?', args: [params.id] });
-  const row = res.rows[0] as { cv_path: string | null; cv_filename: string | null } | undefined;
+  const row = res.rows[0] as unknown as { cv_path: string | null; cv_filename: string | null } | undefined;
 
   if (!row?.cv_path || !fs.existsSync(row.cv_path)) {
     return NextResponse.json({ error: 'Không tìm thấy file CV' }, { status: 404 });
