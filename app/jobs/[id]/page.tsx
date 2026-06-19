@@ -163,6 +163,13 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
                   <td className="py-3">
                     <div className="font-medium text-gray-800">{c.name}</div>
                     <div className="text-xs text-gray-400">{c.email} {c.phone && `· ${c.phone}`}</div>
+                    {c.cv_filename && (
+                      <a href={`/api/candidates/${c.id}/cv`}
+                        target="_blank"
+                        className="text-xs text-blue-500 hover:underline mt-0.5 inline-block">
+                        📄 {c.cv_filename}
+                      </a>
+                    )}
                     {c.cv_summary && (
                       <div className="text-xs text-gray-500 mt-0.5 max-w-xs truncate">{c.cv_summary}</div>
                     )}
