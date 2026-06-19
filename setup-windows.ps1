@@ -1,70 +1,67 @@
-# Setup script cho HR Bot — chay 1 lan duy nhat
-# Chuot phai vao file nay -> "Run with PowerShell"
+# HR Bot - Setup Script for Windows
+# Chay script nay bang: chuot phai -> Run with PowerShell
 
-Write-Host "=== Cai dat HR Bot ===" -ForegroundColor Cyan
+$ErrorActionPreference = "Stop"
+$REPO_URL = "https://github.com/lollibooksteamtay-ux/hr-bot.git"
+$TARGET_DIR = "$HOME\hr-bot"
 
-# 1. Tao thu muc .ssh neu chua co
-$sshDir = "$env:USERPROFILE\.ssh"
-if (-not (Test-Path $sshDir)) {
-    New-Item -ItemType Directory -Path $sshDir | Out-Null
-    Write-Host "Da tao thu muc .ssh" -ForegroundColor Green
-}
+Write-Host ""
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host "   HR BOT - CAI DAT TU DONG" -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Cyan
+Write-Host ""
 
-# 2. Kiem tra SSH key
-$keyPath = "$sshDir\shotsmith_vps"
-if (-not (Test-Path $keyPath)) {
-    Write-Host ""
-    Write-Host "CHUA CO SSH KEY!" -ForegroundColor Red
-    Write-Host "Lam theo buoc sau:" -ForegroundColor Yellow
-    Write-Host "  1. Nhan file 'shotsmith_vps' tu anh Tay (qua Zalo)"
-    Write-Host "  2. Copy file do vao thu muc nay: $sshDir"
-    Write-Host "  3. Chay lai script nay"
-    Write-Host ""
-    Read-Host "Nhan Enter de thoat"
-    exit
-}
-
-# 3. Set quyen SSH key tu dong
-Write-Host "Dang set quyen SSH key..." -ForegroundColor Yellow
+# --- Kiem tra Git ---
+Write-Host "[1/4] Kiem tra Git..." -ForegroundColor Yellow
 try {
-    $acl = Get-Acl $keyPath
-    $acl.SetAccessRuleProtection($true, $false)
-    $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-        $env:USERNAME, "FullControl", "Allow"
-    )
-    $acl.SetAccessRule($rule)
-    Set-Acl $keyPath $acl
-    Write-Host "Quyen SSH key OK" -ForegroundColor Green
+    $gitVersion = git --version 2>&1
+    Write-Host "  OK: $gitVersion" -ForegroundColor Green
 } catch {
-    Write-Host "Loi set quyen: $_" -ForegroundColor Red
-}
-
-# 4. Clone repo neu chua co
-$repoDir = "$env:USERPROFILE\hr-bot"
-if (-not (Test-Path $repoDir)) {
-    Write-Host "Dang tai code ve may..." -ForegroundColor Yellow
-    git clone https://github.com/lollibooksteamtay-ux/hr-bot.git $repoDir
-    Write-Host "Tai code xong!" -ForegroundColor Green
-} else {
-    Write-Host "Thu muc hr-bot da ton tai, bo qua clone" -ForegroundColor Gray
-}
-
-# 5. Kiem tra Git
-$gitVersion = git --version 2>$null
-if (-not $gitVersion) {
-    Write-Host "Git chua duoc cai! Vao https://git-scm.com/download/win de cai" -ForegroundColor Red
+    Write-Host "  LOI: Git chua duoc cai dat." -ForegroundColor Red
+    Write-Host "  Vao https://git-scm.com/download/win de cai Git truoc." -ForegroundColor Red
     Read-Host "Nhan Enter de thoat"
-    exit
+    exit 1
 }
 
+# --- Kiem tra Node.js ---
+Write-Host "[2/4] Kiem tra Node.js..." -ForegroundColor Yellow
+try {
+    $nodeVersion = node --version 2>&1
+    Write-Host "  OK: Node.js $nodeVersion" -ForegroundColor Green
+} catch {
+    Write-Host "  CANH BAO: Node.js chua duoc cai dat." -ForegroundColor Yellow
+    Write-Host "  Vao https://nodejs.org de cai Node.js LTS, sau do chay lai script nay." -ForegroundColor Yellow
+    Read-Host "Nhan Enter de thoat"
+    exit 1
+}
+
+# --- Clone hoac update repo ---
+Write-Host "[3/4] Lay code HR Bot..." -ForegroundColor Yellow
+if (Test-Path $TARGET_DIR) {
+    Write-Host "  Thu muc $TARGET_DIR da ton tai, dang cap nhat..." -ForegroundColor Yellow
+    Set-Location $TARGET_DIR
+    git pull origin main
+    Write-Host "  OK: Da cap nhat code moi nhat." -ForegroundColor Green
+} else {
+    Write-Host "  Dang tai code ve $TARGET_DIR ..." -ForegroundColor Yellow
+    git clone $REPO_URL $TARGET_DIR
+    Set-Location $TARGET_DIR
+    Write-Host "  OK: Tai code thanh cong." -ForegroundColor Green
+}
+
+# --- Cai dependencies ---
+Write-Host "[4/4] Cai dat thu vien (npm install)..." -ForegroundColor Yellow
+npm install --legacy-peer-deps
+Write-Host "  OK: Cai dat xong." -ForegroundColor Green
+
 Write-Host ""
-Write-Host "=== CAI DAT HOAN TAT ===" -ForegroundColor Cyan
+Write-Host "==============================================" -ForegroundColor Green
+Write-Host "   CAI DAT HOAN TAT!" -ForegroundColor Green
+Write-Host "==============================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Tiep theo:" -ForegroundColor Yellow
-Write-Host "  1. Mo Claude Code (app tren may Hien)"
-Write-Host "  2. Go lenh: cd ~/hr-bot"
-Write-Host "  3. Bat dau nhan lenh voi Claude!"
+Write-Host "Buoc tiep theo:" -ForegroundColor Cyan
+Write-Host "  1. Mo Claude Desktop" -ForegroundColor White
+Write-Host "  2. Go lenh: cd ~/hr-bot" -ForegroundColor White
+Write-Host "  3. Nhan Enter va bat dau lam viec!" -ForegroundColor White
 Write-Host ""
-Write-Host "Thu muc code: $repoDir" -ForegroundColor Green
-Write-Host ""
-Read-Host "Nhan Enter de thoat"
+Read-Host "Nhan Enter de dong cua so nay"
